@@ -10,18 +10,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-// Route::prefix('v1')->middleware('throttle:api')->group(function () {
-//     Route::post('register', [AuthController::class, 'register'])->name('auth.register');
-//     Route::post('login', [AuthController::class, 'login'])->name('auth.login');
-// });
-
-// Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum'])->group(function () {
-//     Route::apiResource('categories', CategoryController::class);
-//     Route::apiResource('posts', PostController::class);
-//     Route::get('logout', [AuthController::class, 'logout'])->name('auth.logout');
-// });
-
-
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('products.index');
     Route::get('/{product}', [ProductController::class, 'show'])->name('products.show');
