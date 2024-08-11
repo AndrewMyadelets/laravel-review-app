@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductCollection;
+
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -13,7 +15,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection(Product::with('reviews')->latest()->get());
+        // return ProductResource::collection(Product::with('reviews')->latest()->get());
+
+        return new ProductCollection(Product::with('reviews')->latest()->get());
     }
 
     /**
