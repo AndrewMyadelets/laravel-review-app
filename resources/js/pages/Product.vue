@@ -1,22 +1,31 @@
 <script setup>
 import { useRoute } from "vue-router";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import axiosClient from "../axiosClient";
+import ReviewForm from "../components/ReviewForm.vue";
+import ModalDialog from "../components/ModalDialog.vue";
+import StarRating from "vue-star-rating";
 
 const route = useRoute();
 const product = ref({});
+const reviewToUpdate = ref({
+    updating: false,
+    review: null,
+});
 
 onMounted(async () => {
     let response = await axiosClient.get(`products/${route.params.id}`);
     product.value = response.data.product;
 });
 
-console.log(product);
+const showReviewForm = () => {
+    reviewToUpdate.value.updating = true;
+};
 </script>
 
 <template>
     <div class="font-sans bg-white">
-        <div class="p-4 lg:max-w-7xl max-w-4xl mx-auto">
+        <div class="p-4">
             <div
                 class="grid items-start grid-cols-1 lg:grid-cols-5 gap-12 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] p-6 rounded-lg"
             >
@@ -56,8 +65,23 @@ console.log(product);
                             ${{ product.price }}
                         </p>
                     </div>
+                    <button
+                        type="button"
+                        class="mt-8 mb-4 w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-500 border border-blue-600 text-gray-100 hover:text-white font-bold rounded"
+                        v-if="!reviewToUpdate.updating"
+                        @click="showReviewForm"
+                    >
+                        Add a review
+                    </button>
                 </div>
             </div>
+
+            <ModalDialog v-model="reviewToUpdate.updating">
+                <ReviewForm
+                    :product="product"
+                    v-model="reviewToUpdate.updating"
+                />
+            </ModalDialog>
 
             <div class="mt-16 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] p-6">
                 <h3 class="text-xl font-bold text-gray-800">Reviews(10)</h3>
@@ -184,57 +208,14 @@ console.log(product);
                                 <h4 class="text-sm font-bold text-gray-800">
                                     John Doe
                                 </h4>
-                                <div class="flex space-x-1 mt-1">
-                                    <svg
-                                        class="w-4 fill-blue-600"
-                                        viewBox="0 0 14 13"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        class="w-4 fill-blue-600"
-                                        viewBox="0 0 14 13"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        class="w-4 fill-blue-600"
-                                        viewBox="0 0 14 13"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        class="w-4 fill-[#CED5D8]"
-                                        viewBox="0 0 14 13"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                        />
-                                    </svg>
-                                    <svg
-                                        class="w-4 fill-[#CED5D8]"
-                                        viewBox="0 0 14 13"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                        />
-                                    </svg>
+                                <div class="flex space-x-1 mt-1 items-center">
+                                    <StarRating
+                                        :star-size="17"
+                                        :show-rating="false"
+                                        :active-color="`#2563eb`"
+                                        :rating="3"
+                                        read-only="true"
+                                    />
                                     <p
                                         class="text-xs !ml-2 font-semibold text-gray-800"
                                     >
