@@ -8,19 +8,26 @@ import StarRating from "vue-star-rating";
 
 const route = useRoute();
 const product = ref({});
-const reviewToUpdate = ref({
-    updating: false,
-    review: null,
-});
 
 onMounted(async () => {
     let response = await axiosClient.get(`products/${route.params.id}`);
     product.value = response.data.product;
 });
 
-const showReviewForm = () => {
-    reviewToUpdate.value.updating = true;
-};
+const showReviewForm = ref(false);
+
+const review = ref({
+    rating: 0,
+    body: ''
+});
+
+const saveReview = async () => {
+    let response = await axiosClient.post(`products/${route.params.id}`);
+
+    console.log(review);
+}
+
+
 </script>
 
 <template>
@@ -68,18 +75,20 @@ const showReviewForm = () => {
                     <button
                         type="button"
                         class="mt-8 mb-4 w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-500 border border-blue-600 text-gray-100 hover:text-white font-bold rounded"
-                        v-if="!reviewToUpdate.updating"
-                        @click="showReviewForm"
+                        v-if="!showReviewForm"
+                        @click="showReviewForm = true"
                     >
                         Add a review
                     </button>
                 </div>
             </div>
 
-            <ModalDialog v-model="reviewToUpdate.updating">
+            <ModalDialog v-model="showReviewForm">
                 <ReviewForm
                     :product="product"
-                    v-model="reviewToUpdate.updating"
+                    v-model:open="showReviewForm"
+                    v-model:review="review"
+                    @formSubmitted="saveReview"
                 />
             </ModalDialog>
 
@@ -214,7 +223,7 @@ const showReviewForm = () => {
                                         :show-rating="false"
                                         :active-color="`#2563eb`"
                                         :rating="3"
-                                        read-only="true"
+                                        :read-only="true"
                                     />
                                     <p
                                         class="text-xs !ml-2 font-semibold text-gray-800"

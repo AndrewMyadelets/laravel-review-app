@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from "vue";
 import StarRating from "vue-star-rating";
+import { useToast } from "vue-toastification";
 
 defineProps({
     product: {
@@ -9,18 +9,32 @@ defineProps({
     },
 });
 
-const review = ref({
-    title: "",
-    body: "",
-    rating: 0,
-});
+const emits = defineEmits(["formSubmitted"]);
 
-const open = defineModel();
+const open = defineModel("open");
+const review = defineModel("review");
 
+const toast = useToast();
+
+const onSubmit = () => {
+    if (!review.value.rating) {
+        toast.error("You must rate the product.");
+        return;
+    }
+
+    if (!review.value.body) {
+        toast.error('The "Text" field must be filled in.');
+        return;
+    }
+
+    emits("formSubmitted");
+
+    open.value = false;
+};
 </script>
 
 <template>
-    <form>
+    <form @submit.prevent="onSubmit">
         <div class="space-y-12">
             <div class="border-b border-gray-900/10 pb-12">
                 <h2 class="text-2xl font-semibold leading-7 text-gray-900">
@@ -30,27 +44,14 @@ const open = defineModel();
                 <div
                     class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"
                 >
-                    <div class="col-span-full">
-                        <label
-                            for="title"
-                            class="block text-sm font-medium leading-6 text-gray-900"
-                            >Title</label
-                        >
-                        <div class="mt-2">
-                            <div
-                                class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600"
-                            >
-                                <input
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    class="block w-full border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                    v-model="review.title"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
+                    <StarRating
+                        :star-size="45"
+                        :show-rating="false"
+                        :active-on-click="true"
+                        :active-color="`#2563eb`"
+                        :rating="review.rating"
+                        v-model:rating="review.rating"
+                    />
                     <div class="col-span-full">
                         <label
                             for="about"
@@ -70,14 +71,6 @@ const open = defineModel();
                             Write a few sentences about product.
                         </p>
                     </div>
-                    <StarRating
-                        :star-size="45"
-                        :show-rating="false"
-                        :active-on-click="true"
-                        :active-color="`#2563eb`"
-                        :rating="review.rating"
-                        v-model="review.rating"
-                    />
                 </div>
             </div>
         </div>
