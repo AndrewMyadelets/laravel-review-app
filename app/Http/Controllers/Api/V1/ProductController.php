@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductResource;
-use App\Http\Resources\ProductCollection;
+use App\Http\Resources\Api\V1\ProductResource;
+use App\Http\Resources\Api\V1\ProductCollection;
 
 use App\Models\Product;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the products.
      */
     public function index()
     {

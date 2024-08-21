@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Request;
-use App\Http\Resources\ProductResource;
+use App\Http\Resources\Api\V1\ProductResource;
 
 class ProductCollection extends ProductResource
 {
