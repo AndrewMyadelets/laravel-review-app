@@ -43,7 +43,7 @@ class ReviewController extends Controller
             return ReviewCollection::make($review->where('product_id', $product->id)->limit($request->limit)->latest()->get());
         }
 
-        return ReviewCollection::make($review->where('product_id', $product->id)->get());
+        return ReviewCollection::make($review->where('product_id', $product->id)->latest()->get());
     }
 
     /**

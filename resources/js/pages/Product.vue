@@ -6,7 +6,7 @@ import ReviewForm from "../components/ReviewForm.vue";
 import ModalDialog from "../components/ModalDialog.vue";
 import StarRating from "vue-star-rating";
 import { useToast } from "vue-toastification";
-import { PencilIcon } from "@heroicons/vue/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
 
 const route = useRoute();
 const product = ref({});
@@ -32,7 +32,11 @@ const getReviewsCount = async () => {
 
 const getFirstReviews = async () => {
     const response = await axiosClient.get(
-        `products/${route.params.id}/reviews?limit=3`
+        `products/${route.params.id}/reviews`, {
+            params: {
+                limit: 3
+            }
+        }
     );
     reviews.value = response.data.reviews;
 };
@@ -71,6 +75,26 @@ const editReview = (editableReview) => {
     review.value = { ...editableReview };
 };
 
+const updateReviewList = () => {
+    if (!showAllReviews.value) {
+        getFirstReviews();
+    } else {
+        getAllReviews();
+    }
+}
+
+const deleteReview = async (id) => {
+    try {
+        await axiosClient.delete(`products/${route.params.id}/reviews/${id}`);
+        toast.success("Review deleted.");
+    } catch (error) {
+        console.log(error);
+    }
+
+    getReviewsCount();
+    updateReviewList();
+}
+
 const saveReview = async () => {
     if (!review.value.id) {
         try {
@@ -95,12 +119,7 @@ const saveReview = async () => {
         }
     }
 
-    if (!showAllReviews.value) {
-        getFirstReviews();
-    } else {
-        getAllReviews();
-    }
-
+    updateReviewList();
     cancelReview();
 };
 </script>
@@ -319,7 +338,14 @@ const saveReview = async () => {
                                         title="edit"
                                         @click="editReview(review)"
                                     >
-                                        <PencilIcon class="block size-4" />
+                                        <PencilIcon class="block size-5" />
+                                    </div>
+                                    <div
+                                        class="p-2 cursor-pointer hover:bg-gray-100 rounded-md"
+                                        title="delete"
+                                        @click="deleteReview(review.id)"
+                                    >
+                                        <TrashIcon class="block size-5" />
                                     </div>
                                 </div>
                                 <p class="text-sm mt-4 text-gray-800">
