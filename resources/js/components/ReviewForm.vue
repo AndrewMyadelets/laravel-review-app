@@ -2,13 +2,6 @@
 import StarRating from "vue-star-rating";
 import { useToast } from "vue-toastification";
 
-defineProps({
-    product: {
-        type: Object,
-        required: true,
-    },
-});
-
 const emits = defineEmits(["formSubmitted"]);
 
 const open = defineModel("open");
@@ -28,6 +21,16 @@ const onSubmit = () => {
     }
 
     emits("formSubmitted");
+
+    open.value = false;
+};
+
+const onCancel = () => {
+    review.value = {
+        id: "",
+        rating: 0,
+        body: "",
+    };
 
     open.value = false;
 };
@@ -79,7 +82,7 @@ const onSubmit = () => {
             <button
                 type="button"
                 class="text-sm font-semibold leading-6 text-gray-900"
-                @click="open = false"
+                @click="onCancel"
             >
                 Cancel
             </button>

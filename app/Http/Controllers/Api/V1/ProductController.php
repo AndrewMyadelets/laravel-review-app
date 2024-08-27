@@ -17,7 +17,9 @@ class ProductController extends Controller
     {
         // return ProductResource::collection(Product::with('reviews')->latest()->get());
 
-        return new ProductCollection(Product::with('reviews')->latest()->get());
+        // return ProductCollection::make(Product::with('reviews')->latest()->get());
+
+        return ProductCollection::make(Product::all());
     }
 
     /**
@@ -32,6 +34,8 @@ class ProductController extends Controller
         // dump(ProductResource::make($product->load('reviews'))->reviews);
         // dump(ProductResource::make($product->reviews));
 
-        return ProductResource::make($product->load('reviews'));
+        // return ProductResource::make($product->load('reviews'));
+
+        return ProductResource::make($product);
     }
 }

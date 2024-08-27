@@ -1,33 +1,108 @@
 <script setup>
 import { useRoute } from "vue-router";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import axiosClient from "../axiosClient";
 import ReviewForm from "../components/ReviewForm.vue";
 import ModalDialog from "../components/ModalDialog.vue";
 import StarRating from "vue-star-rating";
+import { useToast } from "vue-toastification";
+import { PencilIcon } from "@heroicons/vue/24/outline";
 
 const route = useRoute();
 const product = ref({});
+const reviewsCount = ref(0);
+const reviews = ref({});
+const review = ref({
+    id: "",
+    rating: 0,
+    body: "",
+    user_id: 1,
+    product_id: route.params.id,
+});
+const showReviewForm = ref(false);
+const showAllReviews = ref(false);
+const toast = useToast();
+
+const getReviewsCount = async () => {
+    const response = await axiosClient.get(
+        `products/${route.params.id}/reviews/count`
+    );
+    reviewsCount.value = response.data;
+};
+
+const getFirstReviews = async () => {
+    const response = await axiosClient.get(
+        `products/${route.params.id}/reviews?limit=3`
+    );
+    reviews.value = response.data.reviews;
+};
 
 onMounted(async () => {
-    let response = await axiosClient.get(`products/${route.params.id}`);
+    const response = await axiosClient.get(`products/${route.params.id}`);
     product.value = response.data.product;
 });
 
-const showReviewForm = ref(false);
-
-const review = ref({
-    rating: 0,
-    body: ''
+onMounted(() => {
+    getReviewsCount();
+    getFirstReviews();
 });
 
+const getAllReviews = async () => {
+    showAllReviews.value = true;
+
+    const response = await axiosClient.get(
+        `products/${route.params.id}/reviews`
+    );
+    reviews.value = response.data.reviews;
+};
+
+const cancelReview = () => {
+    review.value = {
+        id: "",
+        rating: 0,
+        body: "",
+        user_id: 1,
+        product_id: route.params.id,
+    };
+};
+
+const editReview = (editableReview) => {
+    showReviewForm.value = true;
+    review.value = { ...editableReview };
+};
+
 const saveReview = async () => {
-    let response = await axiosClient.post(`products/${route.params.id}`);
+    if (!review.value.id) {
+        try {
+            await axiosClient.post(
+                `products/${route.params.id}/reviews`,
+                review.value
+            );
+            toast.success("Review added.");
+            getReviewsCount();
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        try {
+            await axiosClient.put(
+                `products/${route.params.id}/reviews/${review.value.id}`,
+                review.value
+            );
+            toast.success("Review updated.");
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
-    console.log(review);
-}
+    if (!showAllReviews.value) {
+        getFirstReviews();
+    } else {
+        getAllReviews();
+    }
 
-
+    cancelReview();
+};
 </script>
 
 <template>
@@ -66,7 +141,12 @@ const saveReview = async () => {
                                 </svg>
                                 <span class="font-bold text-xl">4,8</span>
                             </div>
-                            <h4 class="text-gray-600 text-base">500 Reviews</h4>
+                            <h4
+                                class="text-gray-600 text-base"
+                                v-if="reviewsCount"
+                            >
+                                {{ reviewsCount }} Reviews
+                            </h4>
                         </div>
                         <p class="text-gray-800 text-3xl font-bold">
                             ${{ product.price }}
@@ -83,18 +163,22 @@ const saveReview = async () => {
                 </div>
             </div>
 
-            <ModalDialog v-model="showReviewForm">
+            <ModalDialog v-model="showReviewForm" @dialogCancel="cancelReview">
                 <ReviewForm
-                    :product="product"
                     v-model:open="showReviewForm"
                     v-model:review="review"
                     @formSubmitted="saveReview"
                 />
             </ModalDialog>
 
-            <div class="mt-16 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] p-6">
-                <h3 class="text-xl font-bold text-gray-800">Reviews(10)</h3>
-                <div class="grid md:grid-cols-2 gap-12 mt-4">
+            <div
+                class="mt-16 p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)]"
+                v-if="reviewsCount"
+            >
+                <h3 class="text-xl font-bold text-gray-800">
+                    Reviews({{ reviewsCount }})
+                </h3>
+                <div class="mt-4">
                     <div class="space-y-3">
                         <div class="flex items-center">
                             <p class="text-sm text-gray-800 font-bold">5.0</p>
@@ -207,41 +291,48 @@ const saveReview = async () => {
                         </div>
                     </div>
 
-                    <div>
-                        <div class="flex items-start">
-                            <img
-                                src="https://readymadeui.com/team-2.webp"
-                                class="w-12 h-12 rounded-full border-2 border-white"
-                            />
+                    <div class="mt-12">
+                        <div
+                            class="mb-8 flex items-center"
+                            v-for="review of reviews"
+                            :key="review.id"
+                        >
                             <div class="ml-3">
-                                <h4 class="text-sm font-bold text-gray-800">
+                                <h4 class="font-bold text-gray-800">
                                     John Doe
                                 </h4>
-                                <div class="flex space-x-1 mt-1 items-center">
+                                <div class="flex mt-1 items-center">
                                     <StarRating
-                                        :star-size="17"
+                                        :star-size="25"
                                         :show-rating="false"
                                         :active-color="`#2563eb`"
-                                        :rating="3"
+                                        :rating="review.rating"
                                         :read-only="true"
                                     />
                                     <p
-                                        class="text-xs !ml-2 font-semibold text-gray-800"
+                                        class="ml-4 text-sm font-semibold text-gray-800"
                                     >
-                                        2 mins ago
+                                        {{ review.updated }}
                                     </p>
+                                    <div
+                                        class="ml-8 p-2 cursor-pointer hover:bg-gray-100 rounded-md"
+                                        title="edit"
+                                        @click="editReview(review)"
+                                    >
+                                        <PencilIcon class="block size-4" />
+                                    </div>
                                 </div>
                                 <p class="text-sm mt-4 text-gray-800">
-                                    Lorem ipsum dolor sit amet, consectetur
-                                    adipisci elit, sed eiusmod tempor incidunt
-                                    ut labore et dolore magna aliqua.
+                                    {{ review.body }}
                                 </p>
                             </div>
                         </div>
 
                         <button
                             type="button"
-                            class="w-full mt-10 px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-blue-600 text-gray-800 font-bold rounded"
+                            class="w-full px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-blue-600 text-gray-800 font-bold rounded"
+                            @click="getAllReviews"
+                            v-if="!showAllReviews"
                         >
                             Read all reviews
                         </button>

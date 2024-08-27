@@ -7,11 +7,18 @@ import {
 } from "@headlessui/vue";
 
 const open = defineModel();
+
+const emits = defineEmits(["dialogCancel"]);
+
+const onClose = () => {
+    open.value = false;
+    emits('dialogCancel');
+}
 </script>
 
 <template>
     <TransitionRoot as="template" :show="open">
-        <Dialog class="relative z-10" @close="open = false">
+        <Dialog class="relative z-10" @close="onClose">
             <TransitionChild
                 as="template"
                 enter="ease-out duration-300"

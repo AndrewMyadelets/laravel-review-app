@@ -14,6 +14,7 @@ Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('products.index');
     Route::prefix('{product}')->group(function () {
         Route::get('/', [ProductController::class, 'show'])->name('products.show');
+        Route::get('/reviews/count', [ReviewController::class, 'count'])->name('products.reviews.count');
         Route::get('/reviews', [ReviewController::class, 'index'])->name('products.reviews.index');
         Route::post('/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
         Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('products.reviews.update');
