@@ -11,6 +11,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
 const route = useRoute();
 const product = ref({});
 const reviewsCount = ref(0);
+const productRating = ref(0);
 const reviews = ref({});
 const review = ref({
     id: "",
@@ -30,12 +31,20 @@ const getReviewsCount = async () => {
     reviewsCount.value = response.data;
 };
 
+const getProductRating = async () => {
+    const response = await axiosClient.get(
+        `products/${route.params.id}/reviews/rating`
+    );
+    productRating.value = response.data;
+};
+
 const getFirstReviews = async () => {
     const response = await axiosClient.get(
-        `products/${route.params.id}/reviews`, {
+        `products/${route.params.id}/reviews`,
+        {
             params: {
-                limit: 3
-            }
+                limit: 3,
+            },
         }
     );
     reviews.value = response.data.reviews;
@@ -48,6 +57,7 @@ onMounted(async () => {
 
 onMounted(() => {
     getReviewsCount();
+    getProductRating();
     getFirstReviews();
 });
 
@@ -81,7 +91,9 @@ const updateReviewList = () => {
     } else {
         getAllReviews();
     }
-}
+
+    getProductRating();
+};
 
 const deleteReview = async (id) => {
     try {
@@ -93,7 +105,7 @@ const deleteReview = async (id) => {
 
     getReviewsCount();
     updateReviewList();
-}
+};
 
 const saveReview = async () => {
     if (!review.value.id) {
@@ -158,7 +170,7 @@ const saveReview = async () => {
                                         d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
                                     />
                                 </svg>
-                                <span class="font-bold text-xl">4,8</span>
+                                <span class="font-bold text-xl">{{ productRating }}</span>
                             </div>
                             <h4
                                 class="text-gray-600 text-base"
