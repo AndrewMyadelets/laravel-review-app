@@ -12,8 +12,8 @@ const emits = defineEmits(["dialogCancel"]);
 
 const onClose = () => {
     open.value = false;
-    emits('dialogCancel');
-}
+    emits("dialogCancel");
+};
 </script>
 
 <template>
@@ -49,9 +49,7 @@ const onClose = () => {
                         <DialogPanel
                             class="mx-auto max-w-7xl px-2 py-16 sm:px-10 lg:px-12"
                         >
-                            <div
-                                class="p-6 bg-white rounded-lg text-left"
-                            >
+                            <div class="p-6 bg-white rounded-lg text-left">
                                 <slot></slot>
                             </div>
                         </DialogPanel>

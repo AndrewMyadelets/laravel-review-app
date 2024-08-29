@@ -12,30 +12,22 @@ class ProductController extends Controller
 {
     /**
      * Display a listing of the products.
+     * 
+     * @return \App\Http\Resources\Api\V1\ProductCollection
      */
-    public function index()
+    public function index(): ProductCollection
     {
-        // return ProductResource::collection(Product::with('reviews')->latest()->get());
-
-        // return ProductCollection::make(Product::with('reviews')->latest()->get());
-
         return ProductCollection::make(Product::all());
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified product.
+     * 
+     * @param \App\Models\Product $product
+     * @return \App\Http\Resources\Api\V1\ProductResource
      */
-    public function show(Product $product)
+    public function show(Product $product): ProductResource
     {
-        // $productMake = ProductResource::make($product->load('reviews'));// with reviews
-        // $productNew = new ProductResource($product);// without reviews
-        // $productMk = ProductResource::make($product->reviews);
-
-        // dump(ProductResource::make($product->load('reviews'))->reviews);
-        // dump(ProductResource::make($product->reviews));
-
-        // return ProductResource::make($product->load('reviews'));
-
         return ProductResource::make($product);
     }
 }
