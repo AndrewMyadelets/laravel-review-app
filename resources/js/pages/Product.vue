@@ -4,9 +4,8 @@ import { ref, onMounted } from "vue";
 import axiosClient from "../axiosClient";
 import ReviewForm from "../components/ReviewForm.vue";
 import ModalDialog from "../components/ModalDialog.vue";
-import StarRating from "vue-star-rating";
 import { useToast } from "vue-toastification";
-import { PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
+import ReviewList from "../components/ReviewList.vue";
 
 const route = useRoute();
 const product = ref({});
@@ -21,6 +20,7 @@ const review = ref({
     product_id: route.params.id,
 });
 const showReviewForm = ref(false);
+const countOfFirstReviews = 3;
 const showAllReviews = ref(false);
 const toast = useToast();
 
@@ -43,11 +43,15 @@ const getFirstReviews = async () => {
         `products/${route.params.id}/reviews`,
         {
             params: {
-                limit: 3,
+                limit: countOfFirstReviews,
             },
         }
     );
     reviews.value = response.data.reviews;
+
+    if (countOfFirstReviews >= reviewsCount.value) {
+        showAllReviews.value = true;
+    }
 };
 
 onMounted(async () => {
@@ -204,181 +208,14 @@ const saveReview = async () => {
                 />
             </ModalDialog>
 
-            <div
-                class="mt-16 p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)]"
-                v-if="reviewsCount"
-            >
-                <h3 class="text-xl font-bold text-gray-800">
-                    Reviews({{ reviewsCount }})
-                </h3>
-                <div class="mt-4">
-                    <div class="space-y-3">
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-800 font-bold">5.0</p>
-                            <svg
-                                class="w-5 fill-blue-600 ml-1"
-                                viewBox="0 0 14 13"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                />
-                            </svg>
-                            <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div
-                                    class="w-2/3 h-full rounded bg-blue-600"
-                                ></div>
-                            </div>
-                            <p class="text-sm text-gray-800 font-bold ml-3">
-                                66%
-                            </p>
-                        </div>
-
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-800 font-bold">4.0</p>
-                            <svg
-                                class="w-5 fill-blue-600 ml-1"
-                                viewBox="0 0 14 13"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                />
-                            </svg>
-                            <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div
-                                    class="w-1/3 h-full rounded bg-blue-600"
-                                ></div>
-                            </div>
-                            <p class="text-sm text-gray-800 font-bold ml-3">
-                                33%
-                            </p>
-                        </div>
-
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-800 font-bold">3.0</p>
-                            <svg
-                                class="w-5 fill-blue-600 ml-1"
-                                viewBox="0 0 14 13"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                />
-                            </svg>
-                            <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div
-                                    class="w-1/6 h-full rounded bg-blue-600"
-                                ></div>
-                            </div>
-                            <p class="text-sm text-gray-800 font-bold ml-3">
-                                16%
-                            </p>
-                        </div>
-
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-800 font-bold">2.0</p>
-                            <svg
-                                class="w-5 fill-blue-600 ml-1"
-                                viewBox="0 0 14 13"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                />
-                            </svg>
-                            <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div
-                                    class="w-1/12 h-full rounded bg-blue-600"
-                                ></div>
-                            </div>
-                            <p class="text-sm text-gray-800 font-bold ml-3">
-                                8%
-                            </p>
-                        </div>
-
-                        <div class="flex items-center">
-                            <p class="text-sm text-gray-800 font-bold">1.0</p>
-                            <svg
-                                class="w-5 fill-blue-600 ml-1"
-                                viewBox="0 0 14 13"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z"
-                                />
-                            </svg>
-                            <div class="bg-gray-400 rounded w-full h-2 ml-3">
-                                <div
-                                    class="w-[6%] h-full rounded bg-blue-600"
-                                ></div>
-                            </div>
-                            <p class="text-sm text-gray-800 font-bold ml-3">
-                                6%
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mt-12">
-                        <div
-                            class="mb-8 flex items-center"
-                            v-for="review of reviews"
-                            :key="review.id"
-                        >
-                            <div class="ml-3">
-                                <h4 class="font-bold text-gray-800">
-                                    John Doe
-                                </h4>
-                                <div class="flex mt-1 items-center">
-                                    <StarRating
-                                        :star-size="25"
-                                        :show-rating="false"
-                                        :active-color="`#2563eb`"
-                                        :rating="review.rating"
-                                        :read-only="true"
-                                    />
-                                    <p
-                                        class="ml-4 text-sm font-semibold text-gray-800"
-                                    >
-                                        {{ review.updated }}
-                                    </p>
-                                    <div
-                                        class="ml-8 p-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                                        title="edit"
-                                        @click="editReview(review)"
-                                    >
-                                        <PencilIcon class="block size-5" />
-                                    </div>
-                                    <div
-                                        class="p-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                                        title="delete"
-                                        @click="deleteReview(review.id)"
-                                    >
-                                        <TrashIcon class="block size-5" />
-                                    </div>
-                                </div>
-                                <p class="text-sm mt-4 text-gray-800">
-                                    {{ review.body }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="w-full px-4 py-2.5 bg-transparent hover:bg-gray-50 border border-blue-600 text-gray-800 font-bold rounded"
-                            @click="getAllReviews"
-                            v-if="!showAllReviews"
-                        >
-                            Read all reviews
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <ReviewList
+                :reviews-count="reviewsCount"
+                :reviews="reviews"
+                :show-all-reviews="showAllReviews"
+                @getAllReviews="getAllReviews"
+                @editReview="editReview"
+                @deleteReview="deleteReview"
+            />
         </div>
     </div>
 </template>
